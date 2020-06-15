@@ -99,7 +99,7 @@ export class LoggingValidator {
     if (preBranchSHA === postBranchSHA) {
       this.log(
         LogType.Good,
-        `Pre-branch and post-branch SHAs match ${preBranchSHA}.`
+        `Pre-branch and post-branch SHAs match: ${preBranchSHA}.`
       );
       return;
     }
