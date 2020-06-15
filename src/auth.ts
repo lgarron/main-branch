@@ -18,10 +18,6 @@ function readPATFromFile(): string {
   return readFileSync(patFilePath(), "utf8").split("\n", 1)[0];
 }
 
-function getPATFromLocalStorage(): string {
-  return localStorage["github-personal-access-token"];
-}
-
 async function readAndStorePATFromCommandline(): Promise<string> {
   const pat: string = await new Promise((resolve, reject) => {
     try {
@@ -68,6 +64,20 @@ async function getPATFromXDG(): Promise<string> {
   const pat = await readAndStorePATFromCommandline();
   console.log(``)
   return pat;
+}
+
+const LOCAL_STORAGE_KEY = "github-personal-access-token";
+function getPATFromLocalStorage(): string {
+  if (LOCAL_STORAGE_KEY in localStorage) {
+    return localStorage[LOCAL_STORAGE_KEY];
+  } else {
+    const pat = prompt("Please enter a personal access token from GitHub:");
+    if (!pat) {
+      throw new Error("Could not find or get personal acess token.");
+    }
+    localStorage[LOCAL_STORAGE_KEY] = pat;
+    return pat;
+  }
 }
 
 export enum AuthStorage {
