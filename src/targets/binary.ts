@@ -4,7 +4,7 @@ import { create, deleteBranch, info, isOutcomeAnError, Outcome, parseRepo, repla
 import { listPulls, updatePulls } from "../cmd";
 
 function printHelp(): void {
-  console.info("Usage: main-branch owner/repo command ...");
+  console.info("Usage: main-branch owner/repo command old-branch new-branch");
   console.info("A tool to help set the main branch on GitHub.");
   console.info("");
   console.info("  main-branch owner/repo info");

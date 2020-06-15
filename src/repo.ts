@@ -2,7 +2,7 @@ import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import { getPAT } from "./auth";
 import { log, LogType } from "./log";
 
-const getOctokit: () => Promise<Octokit> = (() => {
+const getOctokit: () => Promise<Octokit> = ((): () => Promise<Octokit> => {
   let octokit: Octokit | null = null;
   return async function (): Promise<Octokit> {
     if (!octokit) {

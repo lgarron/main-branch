@@ -17,7 +17,7 @@ export function addLogListener(listener: LogFn) {
 }
 
 export function log(repoName, cmd: string, logType: LogType, ...args): void {
-    const consoleFn: LogFn = (() => {
+    const consoleFn: LogFn = ((): LogFn => {
       switch (logType) {
         case LogType.Error:
           return console.error.bind(console);
@@ -28,7 +28,7 @@ export function log(repoName, cmd: string, logType: LogType, ...args): void {
       }
     })();
 
-    const emojiPrefix: string | null = (() => {
+    const emojiPrefix: string | null = ((): string | null => {
       switch (logType) {
         case LogType.Plan:
           return "🌐";

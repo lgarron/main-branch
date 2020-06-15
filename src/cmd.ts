@@ -503,7 +503,7 @@ async function updatePullsInternal(
   
   repo.log(cmd, LogType.NewLine, ``);
   repo.log(cmd, LogType.Plan, `Updating pull requests.`);
-  await repo.updatePulls(oldBaseBranch, newBaseBranch, (prLink: string) => {
+  await repo.updatePulls(oldBaseBranch, newBaseBranch, (prLink: string): void => {
     repo.log(cmd, LogType.Info, prLink);
   });
   repo.log(cmd, LogType.Plan, `Checking that there are no PRs left.`);
