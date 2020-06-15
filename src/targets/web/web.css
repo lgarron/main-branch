@@ -8,12 +8,20 @@ html, body {
   font-family: sans-serif;
 }
 
+html {
+  background: rgba(159, 178, 254, 0.1);
+}
+
+body {
+  padding: 1em;
+}
+
 #app {
   display: grid;
   grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
   height: 100%;
   gap: 1em;
-  padding: 1em;
 }
 
 #input {
@@ -22,11 +30,13 @@ html, body {
   max-width: 600px;
 }
 
-#repo {
-  margin-top: -1em;
+#settings {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.25em;
 }
 
-.commands {
+#commands {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   gap: 0.4em;

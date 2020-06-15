@@ -3,6 +3,7 @@
 
 <head>
   <title>Main Branch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=0.75">
   <script src="./web.ts"></script>
   <link rel="stylesheet" href="./web.css">
 </head>
@@ -10,14 +11,20 @@
 <body>
   <div id="app">
     <div id="input">
-      <div id="settings"></div>
-      <button id="setPAT">Set Personal Access Token</button>
-      <button id="clearPAT">Clear Personal Access Token</button>
+      <span>Web demo for <a href="https://github.com/lgarron/main-branch">lgarron/main-branch</a>.</span>
       <br>
-      Repo:
+      <div id="settings">
+        <span>Get a repo-scoped personal access token (PAT) from <a href="https://github.com/settings/tokens">here</a>.</span>
+        <div>
+          <button id="setPAT">Set PAT</button>
+          <button id="clearPAT">Clear PAT</button>
+        </div>
+      </div>
+      <br>
+      <span>Repo:</span>
       <input type="text" id="repo" placeholder="Enter URL or owner/repo">
       <br>
-      <div class="commands">
+      <div id="commands">
         <button id="info">Info</button>
         Branch: <input type="text" class="branch">
         <button id="create">Create from default</button>
@@ -31,8 +38,7 @@
       </div>
     </div>
     <div id="output">
-      Output:
-      <textarea id="console"></textarea>
+      <textarea id="console" placeholder="console output"></textarea>
     </div>
   </div>
   </div>
