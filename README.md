@@ -31,7 +31,7 @@ More commands (info, set, create, delete, replace):
 
 ## Notes
 
-- For convenience, you can also call `main` instead of `main-branch`.
+- For convenience, an alias of the `main-branch` binary called `main` is also installed.
 - You can use the repo URL instead of `owner/repo` format.
 
 See [example.md](./example.md) for example output.
