@@ -1,8 +1,29 @@
 import { log, LogType } from "./log";
 import { Repo, RepoSpec } from "./repo";
 
+import * as Color from "colors";
+import { guessEnvironment, Environment } from "./env";
+
 const MASTER = "master";
 const MAIN = "main";
+
+function format(colorName: "blue" | "yellow" | "underline"): (branchName: string) => string {
+  return (branchName: string) => {
+    switch (guessEnvironment()) {
+      case Environment.NodeJS:
+        return Color[colorName](branchName);
+      case Environment.Browser:
+        return branchName
+    }
+  }
+}
+
+// Format branch for printing
+const fb = format("blue");
+// Format SHA for printing
+const fs = format("yellow");
+// Format link for printing
+const fl = format("underline");
 
 export enum Outcome {
   NoOp,
@@ -28,17 +49,17 @@ export async function info(
   const repo = new Repo(repoSpec);
 
   if (infoBranch) {
-    repo.log(cmd, LogType.Plan, `Getting info about the branch ${infoBranch}.`);
+    repo.log(cmd, LogType.Plan, `Getting info about the branch ${fb(infoBranch)}.`);
     repo.log(
       cmd,
       LogType.Info,
-      `SHA for branch: ${await repo.getBranchSHA(infoBranch)}`
+      `SHA for branch: ${fs(await repo.getBranchSHA(infoBranch))}`
     );
     const defaultBranch = await repo.getDefaultBranch();
     repo.log(
       cmd,
       LogType.Info,
-      `${infoBranch} ${
+      `${fb(infoBranch)} ${
         defaultBranch === infoBranch ? "IS" : "IS NOT"
       } the default branch.`
     );
@@ -54,7 +75,7 @@ export async function info(
       repo.log(
         cmd,
         LogType.Info,
-        `Link to an example PR with this base: ${prLink}`
+        `Link to an example PR with this base: ${fl(prLink)}`
       );
     } else {
       repo.log(
@@ -68,21 +89,21 @@ export async function info(
     repo.log(
       cmd,
       LogType.Info,
-      `SHA for master: ${await repo.getBranchSHA(MASTER)}`
+      `SHA for master: ${fs(await repo.getBranchSHA(MASTER))}`
     );
     repo.log(
       cmd,
       LogType.Info,
-      `SHA for main: ${await repo.getBranchSHA(MAIN)}`
+      `SHA for main: ${fs(await repo.getBranchSHA(MAIN))}`
     );
     const defaultBranch = await repo.getDefaultBranch();
-    repo.log(cmd, LogType.Info, `Default branch: ${defaultBranch}`);
+    repo.log(cmd, LogType.Info, `Default branch: ${fb(defaultBranch)}`);
     if (defaultBranch !== MASTER && defaultBranch !== MAIN) {
       const defaultBranchSHA = await repo.getBranchSHA(defaultBranch);
       repo.log(
         cmd,
         LogType.Info,
-        `SHA for default branch (${defaultBranch}): ${defaultBranchSHA}`
+        `SHA for default branch (${fb(defaultBranch)}): ${fs(defaultBranchSHA)}`
       );
     }
   }
@@ -99,7 +120,7 @@ export async function create(
   repo.log(
     cmd,
     LogType.Plan,
-    `Planning to create branch \`${newBranchName}\` from existing default branch.`
+    `Planning to create branch \`${fb(newBranchName)}\` from existing default branch.`
   );
   repo.log(cmd, LogType.Plan, `Getting current default branch name.`);
   const currentDefaultBranchName = await repo.getDefaultBranch();
@@ -116,7 +137,7 @@ export async function create(
     repo.log(
       cmd,
       LogType.Checkmark,
-      `Source branch (${currentDefaultBranchName}) exists on GitHub. SHA: ${sourceBranchExistingSHA}`
+      `Source branch (${currentDefaultBranchName}) exists on GitHub. SHA: ${fs(sourceBranchExistingSHA)}`
     );
   }
   const newBranchExistingSHA = await repo.getBranchSHA(newBranchName);
@@ -124,7 +145,7 @@ export async function create(
     repo.log(
       cmd,
       LogType.OK,
-      `Source branch (${newBranchName}) already exists on GitHub.`
+      `Source branch (${fb(newBranchName)}) already exists on GitHub.`
     );
     if (newBranchExistingSHA === sourceBranchExistingSHA) {
       repo.log(
@@ -138,7 +159,7 @@ export async function create(
       repo.log(
         cmd,
         LogType.Error,
-        `New branch already exists on GitHub, but has a different SHA: ${newBranchExistingSHA}`
+        `New branch already exists on GitHub, but has a different SHA: ${fs(newBranchExistingSHA)}`
       );
       repo.log(
         cmd,
@@ -153,17 +174,17 @@ export async function create(
   repo.log(
     cmd,
     LogType.Plan,
-    `Creating branch ${newBranchName} with SHA ${sourceBranchExistingSHA}`
+    `Creating branch ${fb(newBranchName)} with SHA ${fs(sourceBranchExistingSHA)}`
   );
   try {
     await repo.createBranch(newBranchName, sourceBranchExistingSHA);
     repo.log(
       cmd,
       LogType.Checkmark,
-      `Created branch ${newBranchName} from ${currentDefaultBranchName}`
+      `Created branch ${fb(newBranchName)} from ${fb(currentDefaultBranchName)}`
     );
   } catch (e) {
-    repo.log(cmd, LogType.Error, `Could not create branch ${newBranchName}`);
+    repo.log(cmd, LogType.Error, `Could not create branch ${fb(newBranchName)}`);
     repo.log(cmd, LogType.NewLine, ``);
     return Outcome.Failure;
   }
@@ -172,7 +193,7 @@ export async function create(
   repo.log(
     cmd,
     LogType.Plan,
-    `Verifying that ${newBranchName} has been created.`
+    `Verifying that ${fb(newBranchName)} has been created.`
   );
   repo.log(cmd, LogType.Plan, `Waiting 1000ms before verifying.`);
   await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -189,8 +210,8 @@ export async function create(
     return Outcome.Failure;
   } else {
     repo.log(cmd, LogType.Error, `New branch has the incorrect SHA on GitHub!`);
-    repo.log(cmd, LogType.Error, `Expected: ${sourceBranchExistingSHA}`);
-    repo.log(cmd, LogType.Error, `Actual: ${verificationSHA}`);
+    repo.log(cmd, LogType.Error, `Expected: ${fs(sourceBranchExistingSHA)}`);
+    repo.log(cmd, LogType.Error, `Actual: ${fs(verificationSHA)}`);
     return Outcome.Failure;
   }
 }
@@ -207,7 +228,7 @@ export async function set(
   repo.log(
     cmd,
     LogType.Plan,
-    `Planning to set default branch to ${newDefaultBranchName}`
+    `Planning to set default branch to ${fb(newDefaultBranchName)}`
   );
 
   const currentDefaultBranch = await repo.getDefaultBranch();
@@ -215,7 +236,7 @@ export async function set(
     repo.log(
       cmd,
       LogType.OK,
-      `Existing default branch is: ${currentDefaultBranch}`
+      `Existing default branch is: ${fb(currentDefaultBranch)}`
     );
     repo.log(cmd, LogType.Info, `Nothing new to do.`);
     return;
@@ -226,13 +247,13 @@ export async function set(
     repo.log(
       cmd,
       LogType.Checkmark,
-      `New default branch (${newDefaultBranchName}) exists on GitHub. SHA: ${newDefaultBranchNameSHA}`
+      `New default branch (${fb(newDefaultBranchName)}) exists on GitHub. SHA: ${fs(newDefaultBranchNameSHA)}`
     );
   } else {
     repo.log(
       cmd,
       LogType.Error,
-      `🌐 New default branch (${newDefaultBranchName}) does not exist on GitHub.`
+      `🌐 New default branch (${fb(newDefaultBranchName)}) does not exist on GitHub.`
     );
     return Outcome.Failure
   }
@@ -241,7 +262,7 @@ export async function set(
   repo.log(
     cmd,
     LogType.Plan,
-    `Setting ${newDefaultBranchName} as the default branch on GitHub.`
+    `Setting ${fb(newDefaultBranchName)} as the default branch on GitHub.`
   );
   await repo.setDefaultBranch(newDefaultBranchName);
   repo.log(cmd, LogType.Checkmark, `Success`);
@@ -250,7 +271,7 @@ export async function set(
   repo.log(
     cmd,
     LogType.Plan,
-    `Verifying that ${newDefaultBranchName} is the new default branch.`
+    `Verifying that ${fb(newDefaultBranchName)} is the new default branch.`
   );
   const verificationDefaultBranch = await repo.getDefaultBranch();
   if (verificationDefaultBranch === newDefaultBranchName) {
@@ -261,8 +282,8 @@ export async function set(
       LogType.Error,
       `Default branch on GitHub was not set successfully.`
     );
-    repo.log(cmd, LogType.Error, `Expected: ${newDefaultBranchName}`);
-    repo.log(cmd, LogType.Error, `Actual: ${verificationDefaultBranch}`);
+    repo.log(cmd, LogType.Error, `Expected: ${fb(newDefaultBranchName)}`);
+    repo.log(cmd, LogType.Error, `Actual: ${fb(verificationDefaultBranch)}`);
     return Outcome.Failure;
   }
 }
@@ -280,7 +301,7 @@ export async function deleteBranch(
   repo.log(
     cmd,
     LogType.Plan,
-    `Planning to delete branch \`${branchToDelete}\` from GitHub.`
+    `Planning to delete branch \`${fb(branchToDelete)}\` from GitHub.`
   );
 
   const exists = await repo.branchExists(branchToDelete);
@@ -317,24 +338,24 @@ export async function deleteBranch(
       repo.log(
         cmd,
         LogType.Error,
-        `Example: ${prLink}`
+        `Example: ${fl(prLink)}`
       );
       repo.log(
         cmd,
         LogType.Error,
-        `Please change the base for these PRs before deleting ${branchToDelete}.`
+        `Please change the base for these PRs before deleting ${fb(branchToDelete)}.`
       );
       return Outcome.Failure;
     }
   }
 
   repo.log(cmd, LogType.NewLine, ``);
-  repo.log(cmd, LogType.Plan, `Deleting branch ${branchToDelete}.`);
+  repo.log(cmd, LogType.Plan, `Deleting branch ${fb(branchToDelete)}.`);
   await repo.deleteBranch(branchToDelete);
   repo.log(cmd, LogType.Checkmark, `Branch deleted.`);
 
   repo.log(cmd, LogType.NewLine, ``);
-  repo.log(cmd, LogType.Plan, `Verifying that ${branchToDelete} is deleted.`);
+  repo.log(cmd, LogType.Plan, `Verifying that ${fb(branchToDelete)} is deleted.`);
   repo.log(cmd, LogType.Plan, `Waiting 1000ms before verifying.`);
   await new Promise((resolve) => setTimeout(resolve, 1000));
   const verificationExists = await repo.branchExists(branchToDelete);
@@ -364,7 +385,7 @@ export async function replace(
   repo.log(
     cmd,
     LogType.Plan,
-    `Planning to replace a default branch named ${branchToReplace} with a branch named \`${newDefaultBranchName}\`.`
+    `Planning to replace a default branch named ${fb(branchToReplace)} with a branch named \`${fb(newDefaultBranchName)}\`.`
   );
 
   const currentDefaultBranch = await repo.getDefaultBranch();
@@ -372,11 +393,11 @@ export async function replace(
     repo.log(
       cmd,
       LogType.OK,
-      `The default branch is already ${currentDefaultBranch}.`
+      `The default branch is already ${fb(currentDefaultBranch)}.`
     );
     const branchToReplaceSHA = await repo.getBranchSHA(branchToReplace);
     if (branchToReplaceSHA !== null) {
-      repo.log(cmd, LogType.Info, `The branch ${branchToReplace} also exists.`);
+      repo.log(cmd, LogType.Info, `The branch ${fb(branchToReplace)} also exists.`);
       repo.log(
         cmd,
         LogType.Info,
@@ -391,7 +412,7 @@ export async function replace(
     repo.log(
       cmd,
       LogType.Error,
-      `The current default branch is ${currentDefaultBranch}, not ${branchToReplace}.`
+      `The current default branch is ${fb(currentDefaultBranch)}, not ${fb(branchToReplace)}.`
     );
     repo.log(
       cmd,
@@ -405,7 +426,7 @@ export async function replace(
     repo.log(
       cmd,
       LogType.Error,
-      `Note that this will leave the ${currentDefaultBranch} branch intact.`
+      `Note that this will leave the ${fb(currentDefaultBranch)} branch intact.`
     );
     return Outcome.Failure;
   }
@@ -425,19 +446,19 @@ export async function listPulls(
   const cmd = "list-pulls";
   const repo = new Repo(repoSpec);
 
-  repo.log(cmd, LogType.Plan, `Getting pull request for with the base branch ${baseBranch}.`);
+  repo.log(cmd, LogType.Plan, `Getting pull request for with the base branch ${fb(baseBranch)}.`);
   const exists = repo.branchExists(baseBranch)
   if (exists) {
     repo.log(
       cmd,
       LogType.Info,
-      `Branch ${baseBranch} exists on GitHub.`
+      `Branch ${fb(baseBranch)} exists on GitHub.`
     );
   } else {
     repo.log(
       cmd,
       LogType.OK,
-      `Branch ${baseBranch} does not exist on GitHub.`
+      `Branch ${fb(baseBranch)} does not exist on GitHub.`
     );
     return Outcome.NoOp;
   }
@@ -447,7 +468,7 @@ export async function listPulls(
     repo.log(
       cmd,
       LogType.OK,
-      `No PRs with the base branch ${baseBranch}.`
+      `No PRs with the base branch ${fb(baseBranch)}.`
     );
     return Outcome.NoOp;
   }
@@ -455,7 +476,7 @@ export async function listPulls(
   repo.log(
     cmd,
     LogType.OK,
-    `Found ${prLinks.length} PRs with the base branch ${baseBranch}.`
+    `Found ${prLinks.length} PRs with the base branch ${fb(baseBranch)}.`
   );
   for (const prLink of prLinks) {
     repo.log(
@@ -484,12 +505,12 @@ async function updatePullsInternal(
   const repo = new Repo(repoSpec);
 
   repo.log(cmd, LogType.Plan, `Planning to update pull requests.`);
-  repo.log(cmd, LogType.Plan, `Old base branch ${oldBaseBranch}.`);
-  repo.log(cmd, LogType.Plan, `New base branch ${newBaseBranch}.`);
+  repo.log(cmd, LogType.Plan, `Old base branch ${fb(oldBaseBranch)}.`);
+  repo.log(cmd, LogType.Plan, `New base branch ${fb(newBaseBranch)}.`);
 
   const defaultBranch = await repo.getDefaultBranch();
   if (defaultBranch !== oldBaseBranch) {
-    repo.log(cmd, LogType.Error, `Branch \`${oldBaseBranch}\` is not the default branch.`);
+    repo.log(cmd, LogType.Error, `Branch \`${fb(oldBaseBranch)}\` is not the default branch.`);
     return Outcome.Failure;
   }
 
