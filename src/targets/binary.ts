@@ -72,33 +72,37 @@ async function main(): Promise<void> {
   preBranch = preBranch ?? "master";
   postBranch = postBranch ?? "main";
   const repoSpec: RepoSpec = parseRepo(repo);
-  switch (command) {
-    case "help":
-      printHelp();
-      break;
-    case "info":
-      handleExit(await info(repoSpec, preBranch, postBranch));
-      break;
-    case "create":
-      handleExit(await create(repoSpec, preBranch, postBranch));
-      break;
-    case "set":
-      handleExit(await set(repoSpec, preBranch, postBranch));
-      break;
-    case "list-pulls":
-      handleExit(await listPulls(repoSpec, preBranch, postBranch));
-      break;
-    case "update-pulls":
-      handleExit(await updatePulls(repoSpec, preBranch, postBranch));
-      break;
-    case "delete":
-      handleExit(await deleteBranch(repoSpec, preBranch, postBranch));
-      break;
-    case "replace":
-      handleExit(await replace(repoSpec, preBranch, postBranch));
-      break;
-    default:
-      printHelp();
+  try {
+    switch (command) {
+      case "help":
+        printHelp();
+        break;
+      case "info":
+        handleExit(await info(repoSpec, preBranch, postBranch));
+        break;
+      case "create":
+        handleExit(await create(repoSpec, preBranch, postBranch));
+        break;
+      case "set":
+        handleExit(await set(repoSpec, preBranch, postBranch));
+        break;
+      case "list-pulls":
+        handleExit(await listPulls(repoSpec, preBranch, postBranch));
+        break;
+      case "update-pulls":
+        handleExit(await updatePulls(repoSpec, preBranch, postBranch));
+        break;
+      case "delete":
+        handleExit(await deleteBranch(repoSpec, preBranch, postBranch));
+        break;
+      case "replace":
+        handleExit(await replace(repoSpec, preBranch, postBranch));
+        break;
+      default:
+        printHelp();
+    }
+  } catch (e) {
+    console.error(e.toString());
   }
 }
 
