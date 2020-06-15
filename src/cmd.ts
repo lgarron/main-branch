@@ -1,4 +1,4 @@
-import { Repo, RepoSpec, PRSearchResult, LogType } from "./api";
+import { LogType, PRSearchResult, Repo, RepoSpec } from "./repo";
 
 const MASTER = "master";
 const MAIN = "main";

@@ -10,10 +10,18 @@ const getOctokit: () => Promise<Octokit> = (() => {
     return octokit;
   };
 })();
-
 export interface RepoSpec {
   owner: string;
   repo: string;
+}
+
+export function parseRepoSpec(s: string): RepoSpec {
+  const parts = s.split("/");
+  if (parts.length !== 2) {
+    throw `Invalid repo specification (expected \`owner/repo\` format): ${s}`;
+  }
+  const [owner, repo] = parts;
+  return { owner, repo };
 }
 
 const GITHUB_HTTPS_PREFIX = "https://github.com/"
@@ -25,15 +33,6 @@ export function parseRepo(s: string): RepoSpec {
   } else {
     return parseRepoSpec(s);
   }
-}
-
-export function parseRepoSpec(s: string): RepoSpec {
-  const parts = s.split("/");
-  if (parts.length !== 2) {
-    throw `Invalid repo specification (expected \`owner/repo\` format): ${s}`;
-  }
-  const [owner, repo] = parts;
-  return { owner, repo };
 }
 
 export enum LogType {
