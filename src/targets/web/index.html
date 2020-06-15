@@ -1,1 +1,41 @@
-<script src="web.ts"></script>
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Main Branch</title>
+  <script src="./web.ts"></script>
+  <link rel="stylesheet" href="./web.css">
+</head>
+
+<body>
+  <div id="app">
+    <div id="input">
+      <div id="settings"></div>
+      <button id="setPAT">Set Personal Access Token</button>
+      <button id="clearPAT">Clear Personal Access Token</button>
+      <br>
+      Repo:
+      <input type="text" id="repo" placeholder="Enter URL or owner/repo">
+      <br>
+      <div class="commands">
+        <button id="info">Info</button>
+        Branch: <input type="text" class="branch">
+        <button id="create">Create from default</button>
+        Branch: <input type="text" class="branch" placeholder="main">
+        <button id="set">Set as default</button>
+        Branch: <input type="text" class="branch" placeholder="main">
+        <button id="replace">Replace default</button>
+        Branch: <input type="text" class="branch" placeholder="main">
+        <button id="delete">Delete</button>
+        Branch: <input type="text" class="branch" placeholder="master">
+      </div>
+    </div>
+    <div id="output">
+      Output:
+      <textarea id="console"></textarea>
+    </div>
+  </div>
+  </div>
+</body>
+
+</html>

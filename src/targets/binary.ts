@@ -1,8 +1,6 @@
 import { exit } from "process";
 import "regenerator-runtime/runtime";
-import { AuthStorage, create, deleteBranch, info, isOutcomeAnError, Outcome, parseRepo, replace, RepoSpec, set, setAuthStorage } from "../index";
-
-setAuthStorage(AuthStorage.LocalStorage)
+import { create, deleteBranch, info, isOutcomeAnError, Outcome, parseRepo, replace, RepoSpec, set } from "../index";
 
 function printHelp(): void {
   console.info("Usage: main-branch command owner/repo ...");

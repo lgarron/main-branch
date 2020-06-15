@@ -3,6 +3,7 @@ import {stdin, stdout} from "process";
 import {createInterface} from "readline";
 import { join } from "path";
 import { homedir } from "os";
+import { Environment, guessEnvironment } from "./env";
 
 // This is a function instead of a `const`, so that we don't use `node` packages unless needed.
 function patFilePath(): string {
@@ -85,11 +86,22 @@ export enum AuthStorage {
   XDG
 }
 
-let authStorage = AuthStorage.LocalStorage;
+let authStorage: AuthStorage;
+switch (guessEnvironment()) {
+  case Environment.NodeJS:
+    authStorage = AuthStorage.XDG;
+    break;
+  case Environment.Browser:
+    authStorage = AuthStorage.LocalStorage;
+    break;
+  default:
+    throw new Error("Unknown environment while trying to set auth storage at startup.");
+}
+
 export function setAuthStorage(newAuthStorage: AuthStorage) {
   authStorage = newAuthStorage;
 }
- 
+
 // TODO: replace with prompt/OAuth
 export async function getPAT(): Promise<string> {
   switch (authStorage) {

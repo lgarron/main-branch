@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { getPAT } from "./auth";
+import { log, LogType } from "./log";
 
 const getOctokit: () => Promise<Octokit> = (() => {
   let octokit: Octokit | null = null;
@@ -35,16 +36,6 @@ export function parseRepo(s: string): RepoSpec {
   }
 }
 
-export enum LogType {
-  Plan,
-  Info,
-  Checkmark,
-  OK,
-  Error,
-  Warning,
-  NewLine,
-}
-
 function refForBranch(branchName: string): string {
   // TODO: validate branch name?
   return `heads/${branchName}`;
@@ -68,37 +59,8 @@ export class Repo {
     return new Repo(parseRepoSpec(s));
   }
 
-  log(cmd: string, logType: LogType, ...args): void {
-    const consoleFn = (() => {
-      switch (logType) {
-        case LogType.Error:
-          return console.error.bind(console);
-        case LogType.Info:
-          return console.info.bind(console);
-        default:
-          return console.log.bind(console);
-      }
-    })();
-
-    const emojiPrefix = (() => {
-      switch (logType) {
-        case LogType.Plan:
-          return " 🌐";
-        case LogType.Info:
-          return " ℹ️ ";
-        case LogType.Checkmark:
-          return " ✅";
-        case LogType.OK:
-          return " 🆗";
-        case LogType.Error:
-          return " ❌";
-        case LogType.Warning:
-          return " ⚠️";
-        case LogType.NewLine:
-          return "";
-      }
-    })();
-    consoleFn(`[${this.getName()}] [${cmd}]${emojiPrefix}`, ...args);
+  log(cmd: string, logType: LogType, ...args) {
+    log(this.getName(), cmd, logType, args);
   }
 
   getSpec(): RepoSpec {
