@@ -16,14 +16,15 @@ export interface RepoSpec {
   repo: string;
 }
 
-export enum LogType {
-  Plan,
-  Info,
-  Checkmark,
-  OK,
-  Error,
-  Warning,
-  NewLine,
+const GITHUB_HTTPS_PREFIX = "https://github.com/"
+export function parseRepo(s: string): RepoSpec {
+  if (s.startsWith(GITHUB_HTTPS_PREFIX)) {
+    s = s.slice(GITHUB_HTTPS_PREFIX.length);
+    const [repo, owner] = s.split("/", 2);
+    return {repo, owner}
+  } else {
+    return parseRepoSpec(s);
+  }
 }
 
 export function parseRepoSpec(s: string): RepoSpec {
@@ -33,6 +34,16 @@ export function parseRepoSpec(s: string): RepoSpec {
   }
   const [owner, repo] = parts;
   return { owner, repo };
+}
+
+export enum LogType {
+  Plan,
+  Info,
+  Checkmark,
+  OK,
+  Error,
+  Warning,
+  NewLine,
 }
 
 function refForBranch(branchName: string): string {
