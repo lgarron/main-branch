@@ -42,7 +42,7 @@ export async function info(
         defaultBranch === infoBranch ? "IS" : "IS NOT"
       } the default branch.`
     );
-    const prLink = await repo.anyPRLinkWithBaseBranch(
+    const prLink = await repo.firstPRLink(
       infoBranch
     );
     if (prLink) {
@@ -235,11 +235,6 @@ export async function set(
       `🌐 New default branch (${newDefaultBranchName}) does not exist on GitHub.`
     );
     return Outcome.Failure
-    // repo.log(cmd, LogType.Plan, `🌐 Creating branch ${newDefaultBranchName}.`);
-    // const outcome = await create(repo.getSpec(), newDefaultBranchName);
-    // if (isOutcomeAnError(outcome)) {
-    //   return outcome;
-    // }
   }
 
   repo.log(cmd, LogType.NewLine, ``);
@@ -308,7 +303,7 @@ export async function deleteBranch(
       return Outcome.Failure;
     }
 
-    const prLink = await repo.anyPRLinkWithBaseBranch(
+    const prLink = await repo.firstPRLink(
       branchToDelete
     );
     if (!prLink) {
@@ -417,6 +412,107 @@ export async function replace(
 
   await create(repoSpec, newDefaultBranchName);
   await set(repoSpec, newDefaultBranchName);
+  await updatePullsInternal(repoSpec, newDefaultBranchName, branchToReplace);
   await deleteBranch(repoSpec, branchToReplace);
+  return Outcome.Success;
+}
+
+
+export async function listPulls(
+  repoSpec: RepoSpec,
+  baseBranch: string = MASTER
+): Promise<Outcome> {
+  const cmd = "list-pulls";
+  const repo = new Repo(repoSpec);
+
+  repo.log(cmd, LogType.Plan, `Getting pull request for with the base branch ${baseBranch}.`);
+  const exists = repo.branchExists(baseBranch)
+  if (exists) {
+    repo.log(
+      cmd,
+      LogType.Info,
+      `Branch ${baseBranch} exists on GitHub.`
+    );
+  } else {
+    repo.log(
+      cmd,
+      LogType.OK,
+      `Branch ${baseBranch} does not exist on GitHub.`
+    );
+    return Outcome.NoOp;
+  }
+
+  const prLinks = await repo.allPRLinks(baseBranch);
+  if (prLinks.length === 0) {
+    repo.log(
+      cmd,
+      LogType.OK,
+      `No PRs with the base branch ${baseBranch}.`
+    );
+    return Outcome.NoOp;
+  }
+
+  repo.log(
+    cmd,
+    LogType.OK,
+    `Found ${prLinks.length} PRs with the base branch ${baseBranch}.`
+  );
+  for (const prLink of prLinks) {
+    repo.log(
+      cmd,
+      LogType.Info,
+      prLink
+    );
+  }
+  return Outcome.NoOp;
+}
+
+const UPDATE_PULLS_INTERNAL_DEFAULT_OLD_BASE_BRANCH = MASTER;
+export async function updatePulls(
+  repoSpec: RepoSpec,
+  newBaseBranch: string = MAIN
+): Promise<Outcome> {
+  return updatePullsInternal(repoSpec, newBaseBranch, UPDATE_PULLS_INTERNAL_DEFAULT_OLD_BASE_BRANCH);
+}
+
+async function updatePullsInternal(
+  repoSpec: RepoSpec,
+  newBaseBranch,
+  oldBaseBranch = UPDATE_PULLS_INTERNAL_DEFAULT_OLD_BASE_BRANCH,
+): Promise<Outcome> {
+  const cmd = "update-pulls";
+  const repo = new Repo(repoSpec);
+
+  repo.log(cmd, LogType.Plan, `Planning to update pull requests.`);
+  repo.log(cmd, LogType.Plan, `Old base branch ${oldBaseBranch}.`);
+  repo.log(cmd, LogType.Plan, `New base branch ${newBaseBranch}.`);
+
+  const defaultBranch = await repo.getDefaultBranch();
+  if (defaultBranch !== oldBaseBranch) {
+    repo.log(cmd, LogType.Error, `Branch \`${oldBaseBranch}\` is not the default branch.`);
+    return Outcome.Failure;
+  }
+
+  const prLink = await repo.firstPRLink(oldBaseBranch);
+  if (!prLink) {
+    repo.log(cmd, LogType.Info, `No PRs to update.`, prLink);
+    return Outcome.NoOp;
+  } else {
+    repo.log(cmd, LogType.Info, `There is at least 1 PR to update.`, prLink);
+  }
+  
+  repo.log(cmd, LogType.NewLine, ``);
+  repo.log(cmd, LogType.Plan, `Updating pull requests.`);
+  await repo.updatePulls(oldBaseBranch, newBaseBranch, (prLink: string) => {
+    repo.log(cmd, LogType.Info, prLink);
+  });
+  repo.log(cmd, LogType.Plan, `Checking that there are no PRs left.`);
+  const verificationpPRLink = await repo.firstPRLink(oldBaseBranch);
+  if (!!verificationpPRLink) {
+    repo.log(cmd, LogType.Error, `Failed to update some PRs.`);
+    return Outcome.Failure;
+  } else {
+    repo.log(cmd, LogType.Checkmark, `No PRs left!`);
+  }
   return Outcome.Success;
 }

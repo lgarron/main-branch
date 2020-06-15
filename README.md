@@ -3,7 +3,7 @@
 A tool to replace the main branch for your repository on GitHub safely. Features:
 
 - Individual commands for creating/deleting/setting branches as default on GitHub, as well as a command that does "everything" (`replace`).
-- Checking for any open PRs against the existing default branch.
+- Checks for any open PRs against the existing default branch, and changes the base.
 
 Not supported yet:
 

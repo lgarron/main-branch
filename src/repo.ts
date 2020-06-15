@@ -1,4 +1,4 @@
-import { Octokit } from "@octokit/rest";
+import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import { getPAT } from "./auth";
 import { log, LogType } from "./log";
 
@@ -113,6 +113,7 @@ export class Repo {
     });
   }
 
+  // TODO: Turn into a single iterator.
   private async getPullsWithBase(branchName: string): Promise<any> {
     const octokit = await getOctokit();
     return octokit.paginate.iterator(octokit.pulls.list, {
@@ -123,12 +124,39 @@ export class Repo {
   }
 
   // Returns a PR link if there is one, else returns `null`.
-  async anyPRLinkWithBaseBranch(branchName: string): Promise<string | null> {
+  async firstPRLink(branchName: string): Promise<string | null> {
     for await (const response of await this.getPullsWithBase(branchName)) {
       for (const pull of response.data) {
         return pull.html_url;
       }
     }
     return null;
+  }
+
+  async allPRLinks(branchName: string): Promise<string[]> {
+    const prLinks: string[] = [];
+    for await (const response of await this.getPullsWithBase(branchName)) {
+      for (const pull of response.data) {
+        prLinks.push(pull.html_url);
+      }
+    }
+    return prLinks
+  }
+
+  private async updatePullBase(pull_number: number, newBaseBranch: string): Promise<void> {
+    await (await getOctokit()).pulls.update({
+      ...this.repoSpec,
+      pull_number,
+      base: newBaseBranch
+    })
+  }
+
+  async updatePulls(oldBaseBranch: string, newBaseBranch: string, processingCallback: (prLink: string) => void): Promise<void> {
+    for await (const response of await this.getPullsWithBase(oldBaseBranch)) {
+      for (const pull of response.data) {
+        processingCallback(pull.html_url);
+        await this.updatePullBase(pull.number, newBaseBranch);
+      }
+    }
   }
 }

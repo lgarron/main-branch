@@ -1,7 +1,7 @@
 import "regenerator-runtime/runtime";
 
 import { addLogListener, create, info, parseRepo, RepoSpec } from "../..";
-import { deleteBranch, replace, set } from "../../cmd";
+import { deleteBranch, replace, set, listPulls, updatePulls } from "../../cmd";
 
 enum LocalStorageKey {
   PAT = "github-personal-access-token",
@@ -74,6 +74,8 @@ window.addEventListener("DOMContentLoaded", async () => {
   registerCommand("#info", info);
   registerCommand("#create", create);
   registerCommand("#set", set);
+  registerCommand("#list-pulls", listPulls);
+  registerCommand("#update-pulls", updatePulls);
   registerCommand("#replace", replace);
   registerCommand("#delete", deleteBranch);
 });
