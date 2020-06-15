@@ -41,3 +41,9 @@ More commands (info, set, create, delete, replace):
 - You can use the repo URL instead of `owner/repo` format.
 
 See [example.md](./example.md) for example output.
+
+## Acknowledgments
+
+Thanks to everyone interested and working to change default branch names!
+
+Thanks to `@PurpleBooth` for [the core API code](https://gist.github.com/PurpleBooth/6983e5c4def4f8721d4a697a3f4606a7).
