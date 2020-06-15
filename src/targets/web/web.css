@@ -2,7 +2,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   height: 100%;
   font-family: sans-serif;
@@ -24,6 +25,15 @@ body {
   gap: 1em;
 }
 
+h2 {
+  text-align: center;
+}
+
+#input-wrapper {
+  display: grid;
+  place-content: center center;
+}
+
 #input {
   display: grid;
   grid-template-columns: 1fr;
@@ -36,10 +46,21 @@ body {
   gap: 0.25em;
 }
 
-#commands {
+#commands section {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
   gap: 0.4em;
+}
+
+#commands section.c1 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+#commands section.c2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+#commands section.c4 {
+  grid-template-columns: repeat(4, 1fr);
 }
 
 #console {

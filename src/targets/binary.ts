@@ -1,58 +1,57 @@
 import { exit } from "process";
 import "regenerator-runtime/runtime";
-import { create, deleteBranch, info, isOutcomeAnError, Outcome, parseRepo, replace, RepoSpec, set } from "..";
-import { listPulls, updatePulls } from "../cmd";
+import { isOutcomeAnError, Outcome, parseRepo, RepoSpec } from "..";
+import {
+  info,
+  create,
+  set,
+  listPulls,
+  updatePulls,
+  deleteBranch,
+  replace,
+} from "..";
 
 function printHelp(): void {
-  console.info("Usage: main-branch owner/repo command old-branch new-branch");
-  console.info("A tool to help set the main branch on GitHub.");
-  console.info("");
-  console.info("  main-branch owner/repo info");
-  console.info("  main-branch owner/repo info [branch]");
-  console.info("");
-  console.info("    Get info for entire repo, or the given branch.");
-  console.info("");
-  console.info("  main-branch owner/repo set ");
-  console.info("  main-branch owner/repo set [branch]");
-  console.info("");
-  console.info("    Set the given branch as the default.");
-  console.info("    Creates the branch if it doesn't exist yet.");
-  console.info("    Defaults to `main` for the branch.");
-  console.info("");
-  console.info("  main-branch owner/repo create ");
-  console.info("  main-branch owner/repo create [branch]");
-  console.info("");
-  console.info("    Create the branch from the current default branch.");
-  console.info("    Defaults to `main` for the new branch.");
-  console.info("");
-  console.info("  main-branch owner/repo delete ");
-  console.info("  main-branch owner/repo delete [branch]");
-  console.info("");
-  console.info("    Delete the given branch from the current default branch.");
-  console.info("    Defaults to `master` for the branch to delete.");
-  console.info("");
-  console.info("  main-branch owner/repo replace ");
-  console.info("  main-branch owner/repo replace [branch]");
-  console.info("");
-  console.info("    Replaces the default branch with given branch.");
-  console.info("    In order, this essentially does: create, update-pulls, set, replace.");
-  console.info("    Requires the default branch to start out as `master`.");
-  console.info("    Defaults to `main` for the replacement branch.");
-  console.info("");
-  console.info("  main-branch owner/repo list-pulls");
-  console.info("  main-branch owner/repo list-pulls [branch]");
-  console.info("");
-  console.info("    List PRs with the given base branch.");
-  console.info("    Defaults to `master` for the base branch.");
-  console.info("");
-  console.info("  main-branch owner/repo update-pulls");
-  console.info("  main-branch owner/repo update-pulls [branch]");
-  console.info("");
-  console.info("    Updates base for pull requests with the default branch to the given branch.");
-  console.info("    Requires the default branch to be `master`.");
-  console.info("    Defaults to `main` for the replacement branch.");
-  console.info("");
-  console.info("You can also specify a the repo for a command using its URL.");
+  console.info(`
+Usage: main-branch owner/repo command pre-branch post-branch
+A tool to help set the main branch on GitHub.
+
+• You can also specify a the repo for a command using its URL.
+• pre-branch defaults to master.
+• post-branch defaults to main.
+
+  main-branch owner/repo info pre-branch post-branch
+
+    Get info for specified branches of the repo.
+
+  main-branch owner/repo create pre-branch post-branch
+
+    Create post-branch from pre-branch.
+    The current default branch must be pre-branch.
+
+  main-branch owner/repo set pre-branch post-branch
+
+    Set the post-branch as the default.
+    The current default branch must be pre-branch.
+
+  main-branch owner/repo delete pre-branch post-branch
+
+    Deletes the pre-branch.
+    The current default branch must be post-branch.
+
+  main-branch owner/repo list-pulls pre-branch post-branch
+
+    List PRs with the pre-branch as their base-branch.
+
+  main-branch owner/repo update-pulls pre-branch post-branch
+
+    Updates pull requests with a base of pre-branch to post-branch.
+
+  main-branch owner/repo replace pre-branch post-branch
+
+    Replaces the default branch pre-branch with post-branch.
+    In order, this essentially does: create, set, update-pulls, replace.
+`);
 }
 
 function handleExit(outcome: Outcome) {
@@ -70,32 +69,34 @@ async function main(): Promise<void> {
     printHelp();
     return;
   }
-  const [repo, command, ...args] = process.argv;
+  let [repo, command, preBranch, postBranch] = process.argv;
+  preBranch = preBranch ?? "master";
+  postBranch = postBranch ?? "main";
   const repoSpec: RepoSpec = parseRepo(repo);
   switch (command) {
     case "help":
       printHelp();
       break;
-      case "info":
-        handleExit(await info(repoSpec, ...args));
-        break;
+    case "info":
+      handleExit(await info(repoSpec, preBranch, postBranch));
+      break;
     case "create":
-      handleExit(await create(repoSpec, ...args));
+      handleExit(await create(repoSpec, preBranch, postBranch));
       break;
     case "set":
-      handleExit(await set(repoSpec, ...args));
-      break;
-    case "delete":
-      handleExit(await deleteBranch(repoSpec, ...args));
-      break;
-    case "replace":
-      handleExit(await replace(repoSpec, ...args));
+      handleExit(await set(repoSpec, preBranch, postBranch));
       break;
     case "list-pulls":
-      handleExit(await listPulls(repoSpec, ...args));
+      handleExit(await listPulls(repoSpec, preBranch, postBranch));
       break;
     case "update-pulls":
-      handleExit(await updatePulls(repoSpec, ...args));
+      handleExit(await updatePulls(repoSpec, preBranch, postBranch));
+      break;
+    case "delete":
+      handleExit(await deleteBranch(repoSpec, preBranch, postBranch));
+      break;
+    case "replace":
+      handleExit(await replace(repoSpec, preBranch, postBranch));
       break;
     default:
       printHelp();

@@ -1,8 +1,11 @@
 import { Octokit, RestEndpointMethodTypes } from "@octokit/rest";
 import { getPAT } from "./auth";
 import { log, LogType } from "./log";
+import { Branch } from "./branch";
 
-const getOctokit: () => Promise<Octokit> = ((): () => Promise<Octokit> => {
+export const getOctokit: () => Promise<Octokit> = ((): (() => Promise<
+  Octokit
+>) => {
   let octokit: Octokit | null = null;
   return async function (): Promise<Octokit> {
     if (!octokit) {
@@ -36,17 +39,8 @@ export function parseRepo(s: string): RepoSpec {
   }
 }
 
-function refForBranch(branchName: string): string {
-  // TODO: validate branch name?
-  return `heads/${branchName}`;
-}
-
-function fullRefForBranch(branchName: string): string {
-  return `refs/${refForBranch(branchName)}`;
-}
-
 export class Repo {
-  constructor(private repoSpec: RepoSpec) {}
+  constructor(public readonly spec: RepoSpec) {}
 
   public static fromName(s: string): Repo {
     return new Repo(parseRepoSpec(s));
@@ -56,107 +50,19 @@ export class Repo {
     log(this.getName(), cmd, logType, args);
   }
 
-  getSpec(): RepoSpec {
-    return this.repoSpec;
-  }
-
   getName(): string {
-    return `${this.repoSpec.owner}/${this.repoSpec.repo}`;
+    return `${this.spec.owner}/${this.spec.repo}`;
   }
 
-  async getBranchSHA(branchName: string): Promise<string | null> {
-    try {
-      const ref = (
-        await (await getOctokit()).git.getRef({
-          ...this.repoSpec,
-          ref: refForBranch(branchName),
-        })
-      ).data;
-      return ref.object.sha;
-    } catch (e) {
-      if (e.status === 404) {
-        return null;
-      }
-      throw e;
-    }
+  async getDefaultBranch(): Promise<Branch> {
+    const repo = (await (await getOctokit()).repos.get({ ...this.spec })).data;
+    return new Branch(this, repo.default_branch);
   }
 
-  async branchExists(branchName: string) {
-    return (await this.getBranchSHA(branchName)) !== null;
-  }
-
-  async createBranch(branchName: string, sha: string): Promise<void> {
-    (await getOctokit()).git.createRef({
-      ...this.repoSpec,
-      ref: fullRefForBranch(branchName),
-      sha,
-    });
-  }
-
-  async setDefaultBranch(branchName: string): Promise<void> {
+  async setDefaultBranch(branch: Branch): Promise<void> {
     await (await getOctokit()).repos.update({
-      ...this.repoSpec,
-      default_branch: branchName,
+      ...this.spec,
+      default_branch: branch.name,
     });
-  }
-
-  async getDefaultBranch(): Promise<string> {
-    const repo = (await (await getOctokit()).repos.get({ ...this.repoSpec }))
-      .data;
-    return repo.default_branch;
-  }
-
-  async deleteBranch(branchName: string): Promise<void> {
-    await (await getOctokit()).git.deleteRef({
-      ...this.repoSpec,
-      ref: refForBranch(branchName),
-    });
-  }
-
-  // TODO: Turn into a single iterator.
-  private async getPullsWithBase(branchName: string): Promise<any> {
-    const octokit = await getOctokit();
-    return octokit.paginate.iterator(octokit.pulls.list, {
-      ...this.repoSpec,
-      state: "open",
-      base: branchName,
-    });
-  }
-
-  // Returns a PR link if there is one, else returns `null`.
-  async firstPRLink(branchName: string): Promise<string | null> {
-    for await (const response of await this.getPullsWithBase(branchName)) {
-      for (const pull of response.data) {
-        return pull.html_url;
-      }
-    }
-    return null;
-  }
-
-  async allPRLinks(branchName: string): Promise<string[]> {
-    const prLinks: string[] = [];
-    for await (const response of await this.getPullsWithBase(branchName)) {
-      for (const pull of response.data) {
-        prLinks.push(pull.html_url);
-      }
-    }
-    return prLinks
-  }
-
-  private async updatePullBase(pull_number: number, newBaseBranch: string): Promise<void> {
-    await (await getOctokit()).pulls.update({
-      ...this.repoSpec,
-      pull_number,
-      base: newBaseBranch
-    })
-  }
-
-  async updatePulls(oldBaseBranch: string, newBaseBranch: string, processingCallback: (prLink: string) => void): Promise<void> {
-    for await (const response of await this.getPullsWithBase(oldBaseBranch)) {
-      for (const pull of response.data) {
-        processingCallback(pull.html_url);
-        await this.updatePullBase(pull.number, newBaseBranch);
-      }
-    }
   }
 }

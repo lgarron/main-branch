@@ -11,38 +11,43 @@
 
 <body>
   <div id="app">
-    <div id="input">
-      <span>Web demo for <a href="https://github.com/lgarron/main-branch"><code>main-branch</code></a>.</span>
-      <span>The code does careful checks, but use at your own risk!</span>
-      <span>You can also install this using: <code>npm install main-branch</code></span>
-      <br>
-      <div id="settings">
-        <span>Get a repo-scoped personal access token (PAT) from <a href="https://github.com/settings/tokens">here</a>.</span>
-        <div>
-          <button id="setPAT">Set PAT</button>
-          <button id="checkPAT">Check if PAT is set</button>
-          <button id="clearPAT">Clear PAT</button>
+    <div id="input-wrapper">
+      <div id="input">
+        <h2><a href="https://github.com/lgarron/main-branch"><code>main-branch</code></a> — web demo</h2>
+        <span>The code does careful checks, but use at your own risk!</span>
+        <span>You can also install this using: <code>npm install main-branch</code></span>
+        <br>
+        <div id="settings">
+          <span>Get a repo-scoped personal access token (PAT) from <a
+              href="https://github.com/settings/tokens">here</a>.</span>
+          <div>
+            <button id="setPAT">Set PAT</button>
+            <button id="checkPAT">Check if PAT is set</button>
+            <button id="clearPAT">Clear PAT</button>
+          </div>
         </div>
-      </div>
-      <br>
-      <span>Repo:</span>
-      <input type="text" id="repo" placeholder="Enter URL or owner/repo">
-      <br>
-      <div id="commands">
-        <button id="info">Info</button>
-        Branch: <input type="text" class="branch">
-        <button id="create">Create from default</button>
-        Branch: <input type="text" class="branch" placeholder="main">
-        <button id="set">Set as default</button>
-        Branch: <input type="text" class="branch" placeholder="main">
-        <button id="list-pulls">List Pulls</button>
-        Branch: <input type="text" class="branch" placeholder="master">
-        <button id="update-pulls">Update Pulls</button>
-        Branch: <input type="text" class="branch" placeholder="main">
-        <button id="replace">Replace default</button>
-        Branch: <input type="text" class="branch" placeholder="main">
-        <button id="delete">Delete</button>
-        Branch: <input type="text" class="branch" placeholder="master">
+        <br><span>Repo:</span>
+        <input type="text" id="repo" placeholder="Enter URL or owner/repo"><br>
+        <span>Old default:</span>
+        <input type="text" id="pre-branch" placeholder="master"><br>
+        <span>New default branch:</span>
+        <input type="text" id="post-branch" placeholder="main">
+        <br>
+        <div id="commands">
+          <section class="c2">
+            <button id="info">Info</button>
+            <button id="list-pulls">List Pulls</button>
+          </section><br>
+          <section class="c4">
+            <button id="create">Create</button>
+            <button id="set">Set</button>
+            <button id="update-pulls">Update Pulls</button>
+            <button id="delete">Delete</button>
+          </section><br>
+          <section class="c1">
+            <button id="replace">Replace</button>
+          </section>
+        </div>
       </div>
     </div>
     <div id="output">

@@ -1,8 +1,10 @@
 export enum Environment {
   NodeJS,
-  Browser
+  Browser,
 }
 
 export function guessEnvironment(): Environment {
-  return typeof window === "undefined" ? Environment.NodeJS : Environment.Browser;
+  return typeof window === "undefined"
+    ? Environment.NodeJS
+    : Environment.Browser;
 }
