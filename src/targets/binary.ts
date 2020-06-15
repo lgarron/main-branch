@@ -1,6 +1,6 @@
 import { exit } from "process";
 import "regenerator-runtime/runtime";
-import { create, deleteBranch, info, isOutcomeAnError, Outcome, parseRepo, replace, RepoSpec, set } from "../index";
+import { create, deleteBranch, info, isOutcomeAnError, Outcome, parseRepo, replace, RepoSpec, set } from "..";
 
 function printHelp(): void {
   console.info("Usage: main-branch command owner/repo ...");
