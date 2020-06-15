@@ -335,7 +335,7 @@ class API {
   private async replaceImpl(): Promise<Outcome> {
     this.log(
       Plan,
-      `Planning to replace ${this.preBranch} with a ${this.postBranch}.`
+      `Planning to replace ${this.preBranch} with ${this.postBranch}.`
     );
 
     if (await this.postBranch.isDefault()) {
