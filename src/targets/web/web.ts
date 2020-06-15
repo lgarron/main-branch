@@ -21,13 +21,21 @@ window.addEventListener("DOMContentLoaded", async () => {
   })
 
   document.body.querySelector("#setPAT").addEventListener("click", () => {
-    localStorage[LocalStorageKey.PAT] = prompt("Enter a personal access token from GitHub");
+    const newPAT = prompt("Enter a personal access token from GitHub");
+    if (newPAT) {
+      localStorage[LocalStorageKey.PAT] = newPAT;
+      console.log(`Stored new PAT ${newPAT.length}`);
+    } else {
+      console.error("Did not get new PAT successfully.");
+    }
   });
 
   document.body.querySelector("#checkPAT").addEventListener("click", () => {
     const len: number = (localStorage[LocalStorageKey.PAT] ?? "").length;
-    if (len > 0) {
-      alert(`Personal access token IS set (${len} chars)`);
+    if (len == 40) {
+      alert(`Personal access token IS set (with 40 chars, as expected).`);
+    } else if (len > 0) {
+      alert(`Personal access token IS set, with wrong number of chars (${40}) expected, ${len} actual).`);
     } else {
       alert(`Personal access token IS NOT set.`);
     }
