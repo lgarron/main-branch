@@ -7,6 +7,7 @@ export enum LogType {
   OK,
   Err,
   Warn,
+  Look,
   NewLine,
 }
 
@@ -42,6 +43,8 @@ export function log(repoName, cmd: string, logType: LogType, ...args): void {
         return "❌";
       case LogType.Warn:
         return "⚠️";
+      case LogType.Look:
+        return "🔎";
       case LogType.NewLine:
         return null;
     }

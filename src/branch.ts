@@ -123,7 +123,6 @@ export class Branch {
     }
   }
 
-  // TODO: type
   async isProtected(): Promise<boolean> {
     try {
       await (await getOctokit()).repos.getAdminBranchProtection({
@@ -137,5 +136,25 @@ export class Branch {
       }
       throw new Error(e);
     }
+  }
+
+  async ghPagesBranch(): Promise<Branch | null> {
+    try {
+      const pages = (
+        await (await getOctokit()).repos.getPages({
+          ...this.repo.spec,
+        })
+      ).data;
+      return new Branch(this.repo, pages.source.branch);
+    } catch (e) {
+      if (e.status === 404) {
+        return null;
+      }
+    }
+  }
+
+  async isGHPagesBranch(): Promise<boolean> {
+    const ghPagesBranch = await this.ghPagesBranch();
+    return ghPagesBranch !== null && ghPagesBranch.name === this.name;
   }
 }

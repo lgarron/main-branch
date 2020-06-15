@@ -127,4 +127,18 @@ export class LoggingValidator {
     }
     this.log(LogType.Good, `Pre-branch is not protected: ${this.preBranch}`);
   }
+
+  async preBranchMustNotBeGHPagesBranch(): Promise<void> {
+    if (await this.preBranch.isGHPagesBranch()) {
+      this.log(
+        LogType.Err,
+        `Pre-branch ${this.preBranch} is a GH Pages branch.`
+      );
+      throwValidationError();
+    }
+    this.log(
+      LogType.Good,
+      `Pre-branch ${this.preBranch} is not a GH Pages branch.`
+    );
+  }
 }

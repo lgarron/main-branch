@@ -1,16 +1,18 @@
 # `main-branch`
 
-A tool to replace the main branch for your repository on GitHub safely. Features:
+A tool to replace the main branch for your repository on GitHub safely and easily.
 
-- Individual commands for creating/deleting/setting branches as default on GitHub, as well as a command that does "everything" (`replace`).
-- Checks for any open PRs against the existing default branch, and changes the base.
-- Checks for any admin branch protections, and won't delete branches that have them..
+`main-branch` also guards against removing branches that will affect GitHub features based on the branch. It can also transfer the settings for some of those features to the new branch.
+
+| Branch Feature           | Guards against | Transfers |
+| ------------------------ | -------------- | --------- |
+| Open PRs based on branch | ✅             | ✅        |
+| Branch protections       | ✅             | TODO      |
+| GitHub Pages             | ✅             | TODO      |
 
 Not supported yet:
 
 - Renaming your branches locally in a git repository.
-- Transferring branch protections between branches.
-- Generating instructions for developers using your repo.
 
 # Usage
 

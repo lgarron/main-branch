@@ -1,4 +1,4 @@
-import { RepoSpec, Repo } from "./repo";
+import { RepoSpec, Repo, getOctokit } from "./repo";
 import { LogType } from "./log";
 import { Branch } from "./branch";
 import { LoggingValidator, isValidationError } from "./Validator";
@@ -6,7 +6,7 @@ import { formatLink, formatSHA } from "./print";
 import { waitForDebugger } from "inspector";
 import { guessEnvironment, Environment } from "./env";
 
-const { Plan, Info, Good, OK, Err, Warn, NewLine } = LogType;
+const { Plan, Info, Good, OK, Err, Warn, Look, NewLine } = LogType;
 
 export enum Outcome {
   NoOp,
@@ -89,12 +89,12 @@ class API {
   private async infoImpl(): Promise<Outcome> {
     const prInfo = async (branch: Branch): Promise<void> => {
       const prLink = await branch.firstPRLink();
-      if (prLink) {
-        this.log(Info, `There are open PRs with ${branch} branch as the base.`);
-        this.log(Info, `Link to an example PR with ${branch} as the base:`);
-        this.log(Info, `${formatLink(prLink)}`);
+      if (!!prLink) {
+        this.log(Look, `🔃 ${branch} has open PRs with it as a base.`);
+        this.log(Look, `Link to an example PR with ${branch} as the base:`);
+        this.log(Look, `${formatLink(prLink)}`);
       } else {
-        this.log(Info, `There are no open PRs with ${branch} as the base.`);
+        this.log(Look, `${branch} has no open PRs with it as a base.`);
       }
     };
     const branchInfo = async (branch: Branch): Promise<void> => {
@@ -105,9 +105,19 @@ class API {
         return;
       }
       this.log(Info, `SHA for ${branch}: ${formatSHA(branchSHA)}`);
+      const isProtected: boolean = await branch.isProtected();
       this.log(
-        Info,
-        `${branch} ${(await branch.isProtected()) ? "is" : "is not"} protected.`
+        Look,
+        `${isProtected ? "🔒 " : ""}${branch} ${
+          isProtected ? "is" : "is not"
+        } protected.`
+      );
+      const isGHPagesBranch: boolean = await branch.isGHPagesBranch();
+      this.log(
+        Look,
+        `${isGHPagesBranch ? "📜 " : ""}${branch} ${
+          isGHPagesBranch ? "is" : "is not"
+        } a GitHub Pages branch.`
       );
       await prInfo(branch);
     };
@@ -305,6 +315,7 @@ class API {
     }
 
     await this.validator.preBranchMustNotBeProtected();
+    await this.validator.preBranchMustNotBeGHPagesBranch();
 
     this.log(NewLine, ``);
     this.log(Plan, `Deleting branch ${this.preBranch}.`);
