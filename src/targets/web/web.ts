@@ -24,6 +24,15 @@ window.addEventListener("DOMContentLoaded", async () => {
     localStorage[LocalStorageKey.PAT] = prompt("Enter a personal access token from GitHub");
   });
 
+  document.body.querySelector("#checkPAT").addEventListener("click", () => {
+    const len: number = (localStorage[LocalStorageKey.PAT] ?? "").length;
+    if (len > 0) {
+      alert(`Personal access token IS set (${len} chars)`);
+    } else {
+      alert(`Personal access token IS NOT set.`);
+    }
+  });
+
   document.body.querySelector("#clearPAT").addEventListener("click", () => {
     delete localStorage[LocalStorageKey.PAT];
     alert("PAT has been cleared from local storage");
