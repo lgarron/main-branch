@@ -373,9 +373,7 @@ class API {
       throw e;
     }
 
-    const c = await this.create();
-    console.log("c", c);
-    if (isOutcomeAnError(c)) {
+    if (isOutcomeAnError(await this.create())) {
       return Outcome.Failure;
     }
     if (isOutcomeAnError(await this.set())) {
