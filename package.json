@@ -9,7 +9,8 @@
   },
   "scripts": {
     "build": "npx parcel build src/index.ts && mv dist/index.js dist/index.js.tmp && echo '#!/usr/bin/env node' > dist/index.js && cat dist/index.js.tmp >> dist/index.js && rm dist/index.js.tmp && chmod +x dist/index.js",
-    "prepack": "npm run build"
+    "prepack": "npm run build",
+    "publish": "npm publish"
   },
   "repository": {
     "type": "git",
