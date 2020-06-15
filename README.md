@@ -46,4 +46,4 @@ Consider donating to the [Minnesota Freedom Fund](https://minnesotafreedomfund.o
 
 Thanks to everyone interested and working to change default branch names!
 
-Thanks to `@PurpleBooth` for [the core API code](https://gist.github.com/PurpleBooth/6983e5c4def4f8721d4a697a3f4606a7).
+Thanks to `@PurpleBooth` for [the original core API code](https://gist.github.com/PurpleBooth/6983e5c4def4f8721d4a697a3f4606a7).
