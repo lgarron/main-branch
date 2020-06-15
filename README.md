@@ -25,6 +25,11 @@ Replace `master` with `main`:
 
     main-branch replace owner/repo
 
+Replace `main` with `master` again:
+
+    main-branch set owner/repo master
+    main-branch delete owner/repo main
+
 More commands (info, set, create, delete, replace):
 
     main-branch help
