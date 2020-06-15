@@ -1,3 +1,3 @@
 #!/usr/bin/env fish
 
-npx ts-node src/index.ts $argv
+npx ts-node src/targets/binary.ts $argv

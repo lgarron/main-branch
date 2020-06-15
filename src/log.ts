@@ -51,7 +51,7 @@ export function log(repoName, cmd: string, logType: LogType, ...args): void {
     if (emojiPrefix) {
       formattedArgs.push(emojiPrefix);
     }
-    formattedArgs = formattedArgs.concat(args);
+    formattedArgs = formattedArgs.concat(...args);
 
     consoleFn(...formattedArgs);
     for(const logListener of logListeners) {
