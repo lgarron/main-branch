@@ -130,10 +130,14 @@ export class Repo {
     const paginated = async (allPRs: boolean): Promise<PRSearchResult> => {
       const octokit = await getOctokit();
       const fn: any = allPRs ? octokit.paginate : octokit.request; // TODO: `any` type
-      const pullRequests = await fn("GET /repos/:owner/:repo/pulls", {
+      let pullRequests = (await fn("GET /repos/:owner/:repo/pulls", {
         ...this.repoSpec,
         state: "open",
-      });
+      }));
+      if (!allPRs) {
+        pullRequests = pullRequests.data;
+      }
+      console.log("pullRequests", pullRequests, allPRs)
       for (const pullRequest of pullRequests) {
         if (pullRequest.base.ref === branchName) {
           return {
