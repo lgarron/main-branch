@@ -1,5 +1,5 @@
 import { log, LogType } from "./log";
-import { PRSearchResult, Repo, RepoSpec } from "./repo";
+import { Repo, RepoSpec } from "./repo";
 
 const MASTER = "master";
 const MAIN = "main";
@@ -42,25 +42,25 @@ export async function info(
         defaultBranch === infoBranch ? "IS" : "IS NOT"
       } the default branch.`
     );
-    const prSearchResult: PRSearchResult = await repo.anyPullRequestWithBaseBranch(
+    const prLink = await repo.anyPRLinkWithBaseBranch(
       infoBranch
     );
-    if (prSearchResult.firstFoundPRLink) {
+    if (prLink) {
       repo.log(
         cmd,
         LogType.Info,
-        `There are PRs with this branch as a base (searched ${prSearchResult.numOpenPRsChecked} open PRs).`
+        `There are open PRs with this branch as a base.`
       );
       repo.log(
         cmd,
         LogType.Info,
-        `Link to an example PR with this base: ${prSearchResult.firstFoundPRLink}`
+        `Link to an example PR with this base: ${prLink}`
       );
     } else {
       repo.log(
         cmd,
         LogType.Info,
-        `There are no PRs with this branch as a base (searched ${prSearchResult.numOpenPRsChecked} open PRs).`
+        `There are no open PRs with this branch as a base.`
       );
     }
   } else {
@@ -308,21 +308,21 @@ export async function deleteBranch(
       return Outcome.Failure;
     }
 
-    const prSearchResult = await repo.anyPullRequestWithBaseBranch(
+    const prLink = await repo.anyPRLinkWithBaseBranch(
       branchToDelete
     );
-    if (!prSearchResult.firstFoundPRLink) {
+    if (!prLink) {
       repo.log(
         cmd,
         LogType.Checkmark,
-        `No PRs found with this branch as a base (searched ${prSearchResult.numOpenPRsChecked} open PRs).`
+        `No opn PRs have this branch as a base.`
       );
     } else {
       repo.log(cmd, LogType.Error, `There are PRs with this branch as a base.`);
       repo.log(
         cmd,
         LogType.Error,
-        `Example: ${prSearchResult.firstFoundPRLink}`
+        `Example: ${prLink}`
       );
       repo.log(
         cmd,

@@ -25,12 +25,12 @@ export function parseRepoSpec(s: string): RepoSpec {
   return { owner, repo };
 }
 
-const GITHUB_HTTPS_PREFIX = "https://github.com/"
+const GITHUB_HTTPS_PREFIX = "https://github.com/";
 export function parseRepo(s: string): RepoSpec {
   if (s.startsWith(GITHUB_HTTPS_PREFIX)) {
     s = s.slice(GITHUB_HTTPS_PREFIX.length);
     const [owner, repo] = s.split("/", 2);
-    return {owner, repo}
+    return { owner, repo };
   } else {
     return parseRepoSpec(s);
   }
@@ -43,13 +43,6 @@ function refForBranch(branchName: string): string {
 
 function fullRefForBranch(branchName: string): string {
   return `refs/${refForBranch(branchName)}`;
-}
-
-export interface PRSearchResult {
-  // `null` means no PR was found.
-  // A string will be a link to the first PR found by the search.
-  firstFoundPRLink: string | null;
-  numOpenPRsChecked: number;
 }
 
 export class Repo {
@@ -120,41 +113,22 @@ export class Repo {
     });
   }
 
-  async anyPullRequestWithBaseBranch(
-    branchName: string
-  ): Promise<PRSearchResult> {
-    // Octokit includes a snazzy paginator to get all PRs. But chances are that
-    // we'll find it in the first page, if any. So we optimistically look at the
-    // first page, then all pages. (That's duplicate work for the first page,
-    // but it keeps the code simple for now.)
-    const paginated = async (allPRs: boolean): Promise<PRSearchResult> => {
-      const octokit = await getOctokit();
-      const fn: any = allPRs ? octokit.paginate : octokit.request; // TODO: `any` type
-      let pullRequests = (await fn("GET /repos/:owner/:repo/pulls", {
-        ...this.repoSpec,
-        state: "open",
-      }));
-      if (!allPRs) {
-        pullRequests = pullRequests.data;
+  private async getPullsWithBase(branchName: string): Promise<any> {
+    const octokit = await getOctokit();
+    return octokit.paginate.iterator(octokit.pulls.list, {
+      ...this.repoSpec,
+      state: "open",
+      base: branchName,
+    });
+  }
+
+  // Returns a PR link if there is one, else returns `null`.
+  async anyPRLinkWithBaseBranch(branchName: string): Promise<string | null> {
+    for await (const response of await this.getPullsWithBase(branchName)) {
+      for (const pull of response.data) {
+        return pull.html_url;
       }
-      console.log("pullRequests", pullRequests, allPRs)
-      for (const pullRequest of pullRequests) {
-        if (pullRequest.base.ref === branchName) {
-          return {
-            firstFoundPRLink: pullRequest.html_url,
-            numOpenPRsChecked: pullRequests.length,
-          };
-        }
-      }
-      return {
-        firstFoundPRLink: null,
-        numOpenPRsChecked: pullRequests.length,
-      };
-    };
-    const shortlist = await paginated(false);
-    if (!!shortlist.firstFoundPRLink) {
-      return shortlist;
     }
-    return await paginated(true);
+    return null;
   }
 }
