@@ -16,12 +16,9 @@ Not supported yet:
 
 # Usage
 
-Install (currently relies on `node`):
+Install (currently relies on `node`) and replace `master` with `main`:
 
     npm install -g main-branch
-
-Replace `master` with `main`:
-
     main-branch replace owner/repo
 
 More commands (info, set, create, delete, replace):
