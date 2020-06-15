@@ -41,7 +41,7 @@ See [example.md](./example.md) for example output.
 
 No, it just makes our terminology more inclusive.
 
-Consider donating to the [Minnesota Freedom Fund](https://minnesotafreedomfund.org/donate) or another non-profit, pushong for other important changes in your community, or putting your body/privilege on the line for change.
+Consider donating to the [Minnesota Freedom Fund](https://minnesotafreedomfund.org/donate) or another non-profit, advocating for important changes in your community, or putting your body/privilege on the line for change.
 
 ## Acknowledgments
 
