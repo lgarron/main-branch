@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf8">
+  <title>Main Branch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=0.75">
+  <script src="./web.ts"></script>
+  <link rel="stylesheet" href="./web.css">
+</head>
+
+<body>
+  <div id="app">
+    <div id="input">
+      <span>Web demo for <a href="https://github.com/lgarron/main-branch">lgarron/main-branch</a>.</span>
+      <span>The code does careful checks, but use at your own risk!</span>
+      <span>You can also install this using: <code>npm install main-branch</code></span>
+      <br>
+      <div id="settings">
+        <span>Get a repo-scoped personal access token (PAT) from <a href="https://github.com/settings/tokens">here</a>.</span>
+        <div>
+          <button id="setPAT">Set PAT</button>
+          <button id="clearPAT">Clear PAT</button>
+        </div>
+      </div>
+      <br>
+      <span>Repo:</span>
+      <input type="text" id="repo" placeholder="Enter URL or owner/repo">
+      <br>
+      <div id="commands">
+        <button id="info">Info</button>
+        Branch: <input type="text" class="branch">
+        <button id="create">Create from default</button>
+        Branch: <input type="text" class="branch" placeholder="main">
+        <button id="set">Set as default</button>
+        Branch: <input type="text" class="branch" placeholder="main">
+        <button id="replace">Replace default</button>
+        Branch: <input type="text" class="branch" placeholder="main">
+        <button id="delete">Delete</button>
+        Branch: <input type="text" class="branch" placeholder="master">
+      </div>
+    </div>
+    <div id="output">
+      <textarea id="console" placeholder="console output"></textarea>
+    </div>
+  </div>
+  </div>
+</body>
+
+</html>

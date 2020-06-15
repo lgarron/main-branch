@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { getPAT } from "./auth";
+import { log, LogType } from "./log";
 
 const getOctokit: () => Promise<Octokit> = (() => {
   let octokit: Octokit | null = null;
@@ -10,20 +11,9 @@ const getOctokit: () => Promise<Octokit> = (() => {
     return octokit;
   };
 })();
-
 export interface RepoSpec {
   owner: string;
   repo: string;
-}
-
-export enum LogType {
-  Plan,
-  Info,
-  Checkmark,
-  OK,
-  Error,
-  Warning,
-  NewLine,
 }
 
 export function parseRepoSpec(s: string): RepoSpec {
@@ -33,6 +23,17 @@ export function parseRepoSpec(s: string): RepoSpec {
   }
   const [owner, repo] = parts;
   return { owner, repo };
+}
+
+const GITHUB_HTTPS_PREFIX = "https://github.com/"
+export function parseRepo(s: string): RepoSpec {
+  if (s.startsWith(GITHUB_HTTPS_PREFIX)) {
+    s = s.slice(GITHUB_HTTPS_PREFIX.length);
+    const [owner, repo] = s.split("/", 2);
+    return {owner, repo}
+  } else {
+    return parseRepoSpec(s);
+  }
 }
 
 function refForBranch(branchName: string): string {
@@ -58,37 +59,8 @@ export class Repo {
     return new Repo(parseRepoSpec(s));
   }
 
-  log(cmd: string, logType: LogType, ...args): void {
-    const consoleFn = (() => {
-      switch (logType) {
-        case LogType.Error:
-          return console.error.bind(console);
-        case LogType.Info:
-          return console.info.bind(console);
-        default:
-          return console.log.bind(console);
-      }
-    })();
-
-    const emojiPrefix = (() => {
-      switch (logType) {
-        case LogType.Plan:
-          return " 🌐";
-        case LogType.Info:
-          return " ℹ️ ";
-        case LogType.Checkmark:
-          return " ✅";
-        case LogType.OK:
-          return " 🆗";
-        case LogType.Error:
-          return " ❌";
-        case LogType.Warning:
-          return " ⚠️";
-        case LogType.NewLine:
-          return "";
-      }
-    })();
-    consoleFn(`[${this.getName()}] [${cmd}]${emojiPrefix}`, ...args);
+  log(cmd: string, logType: LogType, ...args) {
+    log(this.getName(), cmd, logType, args);
   }
 
   getSpec(): RepoSpec {
@@ -158,10 +130,14 @@ export class Repo {
     const paginated = async (allPRs: boolean): Promise<PRSearchResult> => {
       const octokit = await getOctokit();
       const fn: any = allPRs ? octokit.paginate : octokit.request; // TODO: `any` type
-      const pullRequests = await fn("GET /repos/:owner/:repo/pulls", {
+      let pullRequests = (await fn("GET /repos/:owner/:repo/pulls", {
         ...this.repoSpec,
         state: "open",
-      });
+      }));
+      if (!allPRs) {
+        pullRequests = pullRequests.data;
+      }
+      console.log("pullRequests", pullRequests, allPRs)
       for (const pullRequest of pullRequests) {
         if (pullRequest.base.ref === branchName) {
           return {

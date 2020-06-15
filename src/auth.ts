@@ -3,6 +3,7 @@ import {stdin, stdout} from "process";
 import {createInterface} from "readline";
 import { join } from "path";
 import { homedir } from "os";
+import { Environment, guessEnvironment } from "./env";
 
 // This is a function instead of a `const`, so that we don't use `node` packages unless needed.
 function patFilePath(): string {
@@ -41,8 +42,7 @@ async function readAndStorePATFromCommandline(): Promise<string> {
   return pat;
 }
 
-// TODO: replace with prompt/OAuth
-export async function getPAT(): Promise<string> {
+async function getPATFromXDG(): Promise<string> {
   if (existsSync(patFilePath())) {
     return readPATFromFile();
   }
@@ -65,4 +65,51 @@ export async function getPAT(): Promise<string> {
   const pat = await readAndStorePATFromCommandline();
   console.log(``)
   return pat;
+}
+
+const LOCAL_STORAGE_KEY = "github-personal-access-token";
+function getPATFromLocalStorage(): string {
+  if (LOCAL_STORAGE_KEY in localStorage) {
+    return localStorage[LOCAL_STORAGE_KEY];
+  } else {
+    const pat = prompt("Please enter a personal access token from GitHub:");
+    if (!pat) {
+      throw new Error("Could not find or get personal acess token.");
+    }
+    localStorage[LOCAL_STORAGE_KEY] = pat;
+    return pat;
+  }
+}
+
+export enum AuthStorage {
+  LocalStorage,
+  XDG
+}
+
+let authStorage: AuthStorage;
+switch (guessEnvironment()) {
+  case Environment.NodeJS:
+    authStorage = AuthStorage.XDG;
+    break;
+  case Environment.Browser:
+    authStorage = AuthStorage.LocalStorage;
+    break;
+  default:
+    throw new Error("Unknown environment while trying to set auth storage at startup.");
+}
+
+export function setAuthStorage(newAuthStorage: AuthStorage) {
+  authStorage = newAuthStorage;
+}
+
+// TODO: replace with prompt/OAuth
+export async function getPAT(): Promise<string> {
+  switch (authStorage) {
+    case AuthStorage.LocalStorage:
+      return getPATFromLocalStorage();
+    case AuthStorage.XDG:
+      return getPATFromXDG();
+    default:
+      throw new Error("Auth storage not specified");
+  }
 }
