@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "fs";
 import {stdin, stdout} from "process";
 import {createInterface} from "readline";
 import { join } from "path";
@@ -6,8 +6,12 @@ import { homedir } from "os";
 
 // This is a function instead of a `const`, so that we don't use `node` packages unless needed.
 function patFilePath(): string {
+  return join(patFileDir(), "github-personal-access-token");
+}
+
+function patFileDir(): string {
   // TODO: Use proper XDG lib
-  return join(homedir(), ".config/main-branch/github-personal-access-token");
+  return join(homedir(), ".config/main-branch");
 }
 
 function readPATFromFile(): string {
@@ -32,6 +36,7 @@ async function readAndStorePATFromCommandline(): Promise<string> {
   })
 
   console.log(`Saving personal access token at: ${patFilePath()}`);
+  mkdirSync(patFileDir(), {recursive: true});
   writeFileSync(patFilePath(), pat, "utf8");
   return pat;
 }
@@ -43,7 +48,8 @@ export async function getPAT(): Promise<string> {
   }
   console.log(``)
   console.log(`No personal access token found.`)
-  console.log(`Please create a personal access token at: https://github.com/settings/tokens`)
+  console.log(`Please create a personal access token with \`repo\` scope at:`)
+  console.log(`https://github.com/settings/tokens`)
   console.log(``)
   console.log(`\`main-branch\` uses a personal access token for:`)
   console.log(``)
