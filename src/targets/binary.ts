@@ -12,8 +12,7 @@ import {
 } from "..";
 
 function printHelp(): void {
-  console.info(`
-Usage: main-branch owner/repo command pre-branch post-branch
+  console.info(`Usage: main-branch owner/repo command pre-branch post-branch
 A tool to help set the main branch on GitHub.
 
 • You can also specify a the repo for a command using its URL.
