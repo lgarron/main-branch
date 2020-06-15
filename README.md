@@ -27,6 +27,7 @@ Replace `master` with `main`:
 
 Replace `main` with `master` again:
 
+    main-branch create owner/repo master
     main-branch set owner/repo master
     main-branch delete owner/repo main
 

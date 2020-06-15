@@ -230,14 +230,15 @@ export async function set(
   } else {
     repo.log(
       cmd,
-      LogType.Info,
+      LogType.Error,
       `🌐 New default branch (${newDefaultBranchName}) does not exist on GitHub.`
     );
-    repo.log(cmd, LogType.Plan, `🌐 Creating branch ${newDefaultBranchName}.`);
-    const outcome = await create(repo.getSpec(), newDefaultBranchName);
-    if (isOutcomeAnError(outcome)) {
-      return outcome;
-    }
+    return Outcome.Failure
+    // repo.log(cmd, LogType.Plan, `🌐 Creating branch ${newDefaultBranchName}.`);
+    // const outcome = await create(repo.getSpec(), newDefaultBranchName);
+    // if (isOutcomeAnError(outcome)) {
+    //   return outcome;
+    // }
   }
 
   repo.log(cmd, LogType.NewLine, ``);
