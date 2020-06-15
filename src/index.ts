@@ -55,7 +55,6 @@ function handleExit(outcome: Outcome) {
 
 const GITHUB_HTTPS_PREFIX = "https://github.com/"
 function parseRepoArg(s: string): RepoSpec {
-  console.log(s);
   if (s.startsWith(GITHUB_HTTPS_PREFIX)) {
     s = s.slice(GITHUB_HTTPS_PREFIX.length);
     const [repo, owner] = s.split("/", 2);
