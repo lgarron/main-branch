@@ -1,0 +1,43 @@
+{
+  "name": "main-branch",
+  "version": "0.0.12",
+  "description": "",
+  "main": "dist/index.js",
+  "bin": {
+    "main": "./dist/index.js",
+    "main-branch": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "npx parcel build src/index.ts && mv dist/index.js dist/index.js.tmp && echo '#!/usr/bin/env node' > dist/index.js && cat dist/index.js.tmp >> dist/index.js && rm dist/index.js.tmp && chmod +x dist/index.js",
+    "prepack": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lgarron/main-branch.git"
+  },
+  "author": "Lucas garron <code@garron.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lgarron/main-branch/issues"
+  },
+  "homepage": "https://github.com/lgarron/main-branch#readme",
+  "dependencies": {
+    "@octokit/rest": "^18.0.0",
+    "regenerator-runtime": "^0.13.5"
+  },
+  "devDependencies": {
+    "@types/node": "^14.0.13",
+    "parcel": "^2.0.0-nightly.291",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.5"
+  },
+  "targets": {
+    "main": {
+      "minify": false,
+      "context": "node",
+      "includeNodeModules": {
+        "regenerator-runtime": true
+      }
+    }
+  }
+}
