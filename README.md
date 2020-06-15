@@ -36,6 +36,12 @@ More commands (info, set, create, delete, replace):
 
 See [example.md](./example.md) for example output.
 
+# Does this solve racism?
+
+No, it just makes our terminology more inclusive.
+
+Consider donating to the [Minnesota Freedom Fund](https://minnesotafreedomfund.org/donate) or another non-profit, pushong for other important changes in your community, or putting your body/privilege on the line for change.
+
 ## Acknowledgments
 
 Thanks to everyone interested and working to change default branch names!
