@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/main/index.js",
   "binary": "dist/binary/index.js",
-  "web": "dist/browser/index.html",
+  "web": "dist/web/index.html",
   "bin": {
     "main": "./dist/binary/index.js",
     "main-branch": "./dist/binary/index.js"
@@ -12,7 +12,7 @@
   "scripts": {
     "build": "npm run build-binary && npm run build-web && npm run build-main",
     "build-binary": "npx parcel build --target binary src/targets/binary.ts && mv dist/binary/index.js dist/binary/index.js.tmp && echo '#!/usr/bin/env node' > dist/binary/index.js && cat dist/binary/index.js.tmp >> dist/binary/index.js && rm dist/binary/index.js.tmp && chmod +x dist/binary/index.js",
-    "build-web": "npx parcel build --target web src/targets/web/index.html",
+    "build-web": "npx parcel build --target web --public-url ./ src/targets/web/index.html",
     "build-main": "npx parcel build --target main src/targets/main.ts",
     "dev-web": "npx parcel serve --target web src/targets/web/index.html",
     "clean": "rm -rf ./.parcel-cache ./dist",

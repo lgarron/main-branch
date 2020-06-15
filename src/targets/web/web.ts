@@ -1,3 +1,5 @@
+import "regenerator-runtime/runtime";
+
 import { addLogListener, create, info, parseRepo, RepoSpec } from "../..";
 import { deleteBranch, replace, set } from "../../cmd";
 

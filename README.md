@@ -17,23 +17,17 @@ Install (currently relies on `node`):
 
     npm install -g main-branch
 
-Get info about a repo:
-
-    main-branch info owner/repo
-
 Replace `master` with `main`:
 
     main-branch replace owner/repo
 
-Replace `main` with `master` again:
-
-    main-branch create owner/repo master
-    main-branch set owner/repo master
-    main-branch delete owner/repo main
-
 More commands (info, set, create, delete, replace):
 
     main-branch help
+
+## Online version
+
+<https://garron.net/app/main-branch/>
 
 ## Notes
 
