@@ -13,7 +13,7 @@ Not supported yet:
 
 # Usage
 
-Install:
+Install (currently relies on `node`):
 
     npm install -g main-branch
 
