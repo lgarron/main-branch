@@ -28,8 +28,8 @@ const GITHUB_HTTPS_PREFIX = "https://github.com/"
 export function parseRepo(s: string): RepoSpec {
   if (s.startsWith(GITHUB_HTTPS_PREFIX)) {
     s = s.slice(GITHUB_HTTPS_PREFIX.length);
-    const [repo, owner] = s.split("/", 2);
-    return {repo, owner}
+    const [owner, repo] = s.split("/", 2);
+    return {owner, repo}
   } else {
     return parseRepoSpec(s);
   }
