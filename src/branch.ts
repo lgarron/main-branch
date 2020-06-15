@@ -122,4 +122,20 @@ export class Branch {
       }
     }
   }
+
+  // TODO: type
+  async isProtected(): Promise<boolean> {
+    try {
+      await (await getOctokit()).repos.getAdminBranchProtection({
+        ...this.repo.spec,
+        branch: this.name,
+      });
+      return true;
+    } catch (e) {
+      if (e.status === 404) {
+        return false;
+      }
+      throw new Error(e);
+    }
+  }
 }

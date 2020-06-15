@@ -119,4 +119,12 @@ export class LoggingValidator {
     }
     return;
   }
+
+  async preBranchMustNotBeProtected(): Promise<void> {
+    if (await this.preBranch.isProtected()) {
+      this.log(LogType.Err, `Pre-branch is protected: ${this.preBranch}`);
+      throwValidationError();
+    }
+    this.log(LogType.Good, `Pre-branch is not protected: ${this.preBranch}`);
+  }
 }

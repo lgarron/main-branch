@@ -105,6 +105,10 @@ class API {
         return;
       }
       this.log(Info, `SHA for ${branch}: ${formatSHA(branchSHA)}`);
+      this.log(
+        Info,
+        `${branch} ${(await branch.isProtected()) ? "is" : "is not"} protected.`
+      );
       await prInfo(branch);
     };
     this.log(Plan, `Planning to get info about the repo.`);
@@ -299,6 +303,8 @@ class API {
       );
       return Outcome.Failure;
     }
+
+    await this.validator.preBranchMustNotBeProtected();
 
     this.log(NewLine, ``);
     this.log(Plan, `Deleting branch ${this.preBranch}.`);

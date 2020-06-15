@@ -4,11 +4,12 @@ A tool to replace the main branch for your repository on GitHub safely. Features
 
 - Individual commands for creating/deleting/setting branches as default on GitHub, as well as a command that does "everything" (`replace`).
 - Checks for any open PRs against the existing default branch, and changes the base.
+- Checks for any admin branch protections, and won't delete branches that have them..
 
 Not supported yet:
 
 - Renaming your branches locally in a git repository.
-- Checking/transferring branch protections in GitHub
+- Transferring branch protections between branches.
 - Generating instructions for developers using your repo.
 
 # Usage
