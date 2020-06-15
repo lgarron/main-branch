@@ -16,8 +16,7 @@
     "build-main": "npx parcel build --target main src/targets/main.ts",
     "dev-web": "npx parcel serve --target web src/targets/web/index.html",
     "clean": "rm -rf ./.parcel-cache ./dist",
-    "prepack": "npm run clean && npm run build",
-    "publish": "npm publish"
+    "prepack": "npm run clean && npm run build"
   },
   "repository": {
     "type": "git",
